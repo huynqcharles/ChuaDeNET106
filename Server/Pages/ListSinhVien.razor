@@ -1,0 +1,68 @@
+﻿@page "/listsinhvien"
+@using Server.Services
+@using global::Shared
+@inject ISinhVienService SinhVienService
+@inject NavigationManager NavigationManager
+
+<h3>ListSinhVien</h3>
+
+<button class="btn btn-primary" @onclick="NavigateToCreate">Create New</button>
+
+@if (SinhViens == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Age</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sv in SinhViens)
+            {
+                <tr>
+                    <th scope="row">@sv.Id</th>
+                    <td>@sv.Name</td>
+                    <td>@sv.Age</td>
+                    <td>
+                        <button class="btn btn-warning" @onclick="() => NavigateToEdit(sv.Id)">Edit</button>
+                        <button class="btn btn-danger" @onclick="() => ClickDelete(sv.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    private List<SinhVien> SinhViens;
+
+    protected override async Task OnInitializedAsync()
+    {
+        SinhViens = await SinhVienService.GetAll();
+    }
+
+    protected async Task NavigateToCreate()
+    {
+        NavigationManager.NavigateTo("/create");
+    }
+
+    protected async Task NavigateToEdit(int id)
+    {
+        NavigationManager.NavigateTo($"/edit/{id}");
+    }
+
+    protected async Task ClickDelete(int id)
+    {
+        await SinhVienService.Delete(id);
+        SinhViens = await SinhVienService.GetAll();
+    }
+
+}
